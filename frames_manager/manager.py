@@ -1,9 +1,9 @@
 import cv2
 
 
-def extract_frames( video_path, output_folder ):
+def extract_frames( video_path, output_folder, prefix, verbose=True ):
 
-    print("Proccesing vide0 %s" % video_path)
+    print("Proccesing video %s" % video_path)
     
     capture = cv2.VideoCapture(video_path)
 
@@ -14,15 +14,18 @@ def extract_frames( video_path, output_folder ):
         success, frame = capture.read()
     
         if success:
-            cv2.imwrite(f'{output_folder}/{frames_counter}.jpg', frame)
+            output_name = f'{output_folder}{prefix}-{frames_counter+1}.jpg'
+            cv2.imwrite(output_name, frame)
     
         else:
             break
-
-        print("Processing frame %d" % frames_counter)
+        
+        if verbose:
+            print("Processing frame: %s" % output_name)
     
         frames_counter+=1
 
     capture.release()
 
     print("Total frames extracted: %d" % frames_counter)
+    return frames_counter
