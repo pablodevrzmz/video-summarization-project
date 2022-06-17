@@ -1,7 +1,7 @@
 from frames_manager.manager import extract_frames
 from model.model import extract_features
 import os
-
+import sys
 
 '''
 Dataset summary
@@ -59,14 +59,17 @@ def run_video_sumarization(frames_path):
     main_featues = extract_features(frames_path)
     print(f"Features summary: final array shape: {main_featues[0].shape}, used frames: {len(main_featues[1])}")
 
-def generate_dataset():
-    frames_per_video = split_dataset("C:\\Users\\XPC\\Downloads\\SumMe\\videos\\")
+def generate_dataset(path):
+    frames_per_video = split_dataset(path)
     print(frames_per_video)
 
 if __name__ == "__main__":
 
+    dataset_path = sys.argv[1] # frames_per_video = split_dataset("C:\\Users\\XPC\\Downloads\\SumMe\\videos\\
+    video_frame_path = sys.argv[2] # ./frames_dataset/SumMe/Jumps/
+
     # Preprocessing steps
-    generate_dataset()
+    generate_dataset(dataset_path)
 
     # Summarize video frames
-    run_video_sumarization(f"./frames_dataset/SumMe/Jumps/")
+    run_video_sumarization(video_frame_path)
