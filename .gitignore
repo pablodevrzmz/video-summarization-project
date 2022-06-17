@@ -3,6 +3,7 @@ __pycache__/
 *.py[cod]
 *$py.class+
 /frames_dataset
+/SumMe
 
 # C extensions
 *.so
