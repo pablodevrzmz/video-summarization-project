@@ -60,4 +60,4 @@ def extract_features(image_dir_path):
     X = preprocess_input(X)
 
     print("Step 3: Extracting features")
-    return model.predict(X), X_Control
+    return model.predict(X), X_Control,files
