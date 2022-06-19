@@ -13,7 +13,8 @@ CLUSTERS_PERCENTAGE = 0.10
 
 def split_dataset(dataset_path):
 
-    if not os.path.exists("frames_dataset\\SumMe"):
+    if not os.path.exists("frames_dataset"):
+        os.mkdir("frames_dataset")
         os.mkdir("frames_dataset\\SumMe")
 
     videos = [

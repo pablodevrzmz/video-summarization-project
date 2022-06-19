@@ -15,6 +15,7 @@ def extract_frames( video_path, output_folder, prefix, verbose=True ):
     
         if success:
             output_name = f'{output_folder}{prefix}-{frames_counter+1}.jpg'
+            frame = __resize_img(frame,50)
             cv2.imwrite(output_name, frame)
     
         else:
@@ -29,3 +30,9 @@ def extract_frames( video_path, output_folder, prefix, verbose=True ):
 
     print("Total frames extracted: %d" % frames_counter)
     return frames_counter
+
+def __resize_img(img,scale_percent):
+    width = int(img.shape[1] * scale_percent / 100)
+    height = int(img.shape[0] * scale_percent / 100)
+    dim = (width, height)
+    return cv2.resize(img, dim, interpolation = cv2.INTER_AREA)

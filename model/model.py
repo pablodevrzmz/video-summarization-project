@@ -24,7 +24,7 @@ def __chunks(lst, n):
 #https://towardsdatascience.com/extract-features-visualize-filters-and-feature-maps-in-vgg16-and-vgg19-cnn-models-d2da6333edd0
 # image shape=[samples, rows, cols, channels]
 
-def extract_features(image_dir_path):
+def extract_features(image_dir_path, frames_chunks=25, features_chunks = 10):
 
     __print_cuda_summary()
     
@@ -42,7 +42,7 @@ def extract_features(image_dir_path):
     X = list()
     X_Control = list()
 
-    frame_chunks = __chunks(files,25)
+    frame_chunks = __chunks(files,frames_chunks)
 
     for j,chunck in enumerate(frame_chunks):
         print(f"\tReading chunk {j+1}")
@@ -59,5 +59,18 @@ def extract_features(image_dir_path):
     X = np.array(X).squeeze() #Removes the 'samples' part of the shape from each image, which is of shape=1, and the new amount of sample will be the first array, containing the amount of images.
     X = preprocess_input(X)
 
-    print("Step 3: Extracting features")
-    return model.predict(X), X_Control,files
+    print("Step 3: Extracting features with chucks")
+
+    final_features = []
+    arrays_chunks = __chunks(X,features_chunks) 
+
+    x_chunks = sum([1 for i in  __chunks(X,features_chunks)])
+    counter = 0
+
+    for arr in arrays_chunks:
+        print("Processing chunk %d of %d" % (counter,x_chunks))
+        for e in model.predict(arr):
+            final_features.append(e)
+        counter += 1
+
+    return np.array(final_features), X_Control,files
