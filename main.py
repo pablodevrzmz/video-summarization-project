@@ -3,6 +3,7 @@ from model.model import extract_features
 from clustering import clustering
 import os
 import sys
+import numpy as np
 
 '''
 Dataset summary
@@ -67,23 +68,24 @@ def run_video_sumarization(frames_path):
 
     all_frames = data[2]
 
-    # Generate clusters (K medoids)
-    print("\nRunning clustering K medoids")
+    print("\nRunning clustering")
     target_clusters = int(len(data[1])*CLUSTERS_PERCENTAGE) # 10% of frames
 
-    cluster_mapping, medoids_indices = clustering.run_k_medoids(data[0],target_clusters)
-    #medoids_clusters_mapping = [ cluster_mapping[i] for i in medoids_indices ]
+    algorithms = ["kmedoids","aglomerative"]
+    methods = [clustering.run_k_medoids, clustering.run_aglomerative_clustering]
 
-    final_bit_map = summarization_bit_map(all_frames,data[1],medoids_indices)
-
-    print(final_bit_map)
+    for i,v in enumerate(algorithms):
+        print(f"Running {v}...")
+        _, center_indices = methods[i](data[0],target_clusters)
+        final_bit_map = summarization_bit_map(all_frames,data[1],center_indices)
+        np.savetxt(f"{frames_path}{v}.csv",np.array(final_bit_map),delimiter=",")
 
 def generate_dataset(path):
     # Stage (1)
     frames_per_video = split_dataset(path)
     print(frames_per_video)
 
-def summarization_bit_map(all_frames,selected_frames,centers_indices,smooth_rate_sec=10):
+def summarization_bit_map(all_frames,selected_frames,centers_indices,smooth_rate_sec=5):
     final_map = [0]*len(all_frames)
 
     center_frames = [selected_frames[i] for i in centers_indices]

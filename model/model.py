@@ -43,17 +43,18 @@ def extract_features(image_dir_path, frames_chunks=25, features_chunks = 10):
     X_Control = list()
 
     frame_chunks = __chunks(files,frames_chunks)
+    FACTOR=2
 
     for j,chunck in enumerate(frame_chunks):
         print(f"\tReading chunk {j+1}")
-        for i in range(0, 5):
-            if i*5 < len(chunck):
-                img_path=image_dir_path+chunck[i*5]
+        for i in range(0, len(chunck)):
+            if i*FACTOR < len(chunck):
+                img_path=image_dir_path+chunck[i*FACTOR]
                 img = image.load_img(img_path)
                 loaded_img = image.img_to_array(img)
                 img_dims = np.expand_dims(loaded_img, axis=0)
                 X.append(img_dims)
-                X_Control.append(chunck[i*5])
+                X_Control.append(chunck[i*FACTOR])
     
     print("Step 2: Images ready as numpy arrays")
     X = np.array(X).squeeze() #Removes the 'samples' part of the shape from each image, which is of shape=1, and the new amount of sample will be the first array, containing the amount of images.
