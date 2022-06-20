@@ -4,6 +4,7 @@ __pycache__/
 *$py.class+
 /frames_dataset
 /SumMe
+/summarized_videos
 
 # C extensions
 *.so

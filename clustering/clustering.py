@@ -3,7 +3,7 @@ from sklearn.cluster import DBSCAN, AgglomerativeClustering
 from numpy import indices, unique, where, array_equal
 
 def run_k_medoids(data, n_clusters):
-    model = KMedoids(n_clusters=n_clusters)
+    model = KMedoids(n_clusters=n_clusters, random_state=1)
     model.fit(data)
     centroids = model.medoid_indices_
     return model.labels_, centroids

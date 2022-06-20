@@ -24,11 +24,13 @@ def __chunks(lst, n):
 #https://towardsdatascience.com/extract-features-visualize-filters-and-feature-maps-in-vgg16-and-vgg19-cnn-models-d2da6333edd0
 # image shape=[samples, rows, cols, channels]
 
-def extract_features(image_dir_path, frames_chunks=25, features_chunks = 10):
+def extract_features(image_dir_path, frames_chunks=25, features_chunks = 5):
 
     __print_cuda_summary()
     
     files = os.listdir(image_dir_path)
+    files = [ f for f in files if f.endswith(".jpg") ]
+    files = sorted(files)
     frames_count = len(files)
 
     print(f"Step 1: Processing {frames_count} frames from path {image_dir_path}")
