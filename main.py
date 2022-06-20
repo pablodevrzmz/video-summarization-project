@@ -13,9 +13,11 @@ Dataset summary
 '''
 
 CLUSTERS_PERCENTAGE = 0.15
-SMOOTH_RATE = 25
+SMOOTH_RATE = 2
 NUMBER_OF_FRAME_CHUNKS = 25
+NUMBER_OF_FRAME_SELECTION_FACTOR = 2
 NUMBER_OF_FLATTEN_ARRAYS_CHUNKS = 5
+
 
 VIDEOS = [
     "Air_Force_One.mp4",
@@ -69,7 +71,7 @@ def split_dataset(dataset_path):
 def run_video_sumarization(frames_path):
 
     # Extract feautures. Stage (2)
-    data = extract_features(frames_path, NUMBER_OF_FRAME_CHUNKS, NUMBER_OF_FLATTEN_ARRAYS_CHUNKS)
+    data = extract_features(frames_path, NUMBER_OF_FRAME_CHUNKS, NUMBER_OF_FLATTEN_ARRAYS_CHUNKS,NUMBER_OF_FRAME_SELECTION_FACTOR)
     print(f"Features summary: final array shape: {data[0].shape}, used frames: {len(data[1])}")
 
     all_frames = data[2]

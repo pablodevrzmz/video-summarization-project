@@ -24,7 +24,7 @@ def __chunks(lst, n):
 #https://towardsdatascience.com/extract-features-visualize-filters-and-feature-maps-in-vgg16-and-vgg19-cnn-models-d2da6333edd0
 # image shape=[samples, rows, cols, channels]
 
-def extract_features(image_dir_path, frames_chunks=25, features_chunks = 5):
+def extract_features(image_dir_path, frames_chunks=25, features_chunks = 5, selection_factor = 5):
 
     __print_cuda_summary()
     
@@ -45,18 +45,17 @@ def extract_features(image_dir_path, frames_chunks=25, features_chunks = 5):
     X_Control = list()
 
     frame_chunks = __chunks(files,frames_chunks)
-    FACTOR=2
 
     for j,chunck in enumerate(frame_chunks):
         print(f"\tReading chunk {j+1}")
         for i in range(0, len(chunck)):
-            if i*FACTOR < len(chunck):
-                img_path=image_dir_path+chunck[i*FACTOR]
+            if i*selection_factor < len(chunck):
+                img_path=image_dir_path+chunck[i*selection_factor]
                 img = image.load_img(img_path)
                 loaded_img = image.img_to_array(img)
                 img_dims = np.expand_dims(loaded_img, axis=0)
                 X.append(img_dims)
-                X_Control.append(chunck[i*FACTOR])
+                X_Control.append(chunck[i*selection_factor])
     
     print("Step 2: Images ready as numpy arrays")
     X = np.array(X).squeeze() #Removes the 'samples' part of the shape from each image, which is of shape=1, and the new amount of sample will be the first array, containing the amount of images.

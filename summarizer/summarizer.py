@@ -19,17 +19,19 @@ def create_video_from_frames(frames,prefix,bitmap,algo):
     img_array = []
 
     for i,v in enumerate(bitmap):
-        if v == 1: selected_frames.append(frames[i])
+        if v == 1: selected_frames.append(int(frames[i].replace(".jpg", "")))
+
+    selected_frames = sorted(selected_frames)
 
     for f in selected_frames:
-        img =  cv2.imread(f"{frames_path}\\{f}")
+        img =  cv2.imread(f"{frames_path}\\{f}.jpg")
         height, width, _ = img.shape
         size = (width,height)
         img_array.append(img)
 
     print(f"Selected frames to create video {len(selected_frames)}")
 
-    out = cv2.VideoWriter(f"{FOLDER}{prefix}\\{prefix}_{algo}.avi",cv2.VideoWriter_fourcc(*'DIVX'), 15, size)
+    out = cv2.VideoWriter(f"{FOLDER}{prefix}\\{prefix}_{algo}.avi",cv2.VideoWriter_fourcc(*'DIVX'), 25, size)
     
     for i in range(len(img_array)):
         out.write(img_array[i])

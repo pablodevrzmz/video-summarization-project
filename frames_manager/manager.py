@@ -14,7 +14,8 @@ def extract_frames( video_path, output_folder, prefix, verbose=True ):
         success, frame = capture.read()
     
         if success:
-            output_name = f'{output_folder}{prefix}-{frames_counter+1}.jpg'
+            #output_name = f'{output_folder}{prefix}-{frames_counter+1}.jpg'
+            output_name = f'{output_folder}{frames_counter+1}.jpg'
             frame = __resize_img(frame,50)
             cv2.imwrite(output_name, frame)
     
