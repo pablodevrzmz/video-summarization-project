@@ -1,6 +1,7 @@
-from tensorflow.keras.applications.vgg16 import VGG16, preprocess_input
+from statistics import mode
+import tensorflow.keras.applications.vgg16 as vgg16
+import tensorflow.keras.applications.inception_v3 as inception_v3
 from tensorflow.keras.preprocessing import image
-from tensorflow.keras.utils import image_dataset_from_directory
 from tensorflow.keras.layers import Flatten
 from tensorflow.keras.models import Model
 import numpy as np
@@ -12,10 +13,6 @@ def __print_cuda_summary():
     print("Num CPUs Available: ", len(tf.config.list_physical_devices('CPU')))
     print("Cuda Availability: ", tf.test.is_built_with_cuda())
 
-def __get_frames_len(dir_path):
-    _, _, files = next(os.walk(dir_path))
-    return len(files)
-
 def __chunks(lst, n):
     """Yield successive n-sized chunks from lst."""
     for i in range(0, len(lst), n):
@@ -24,7 +21,7 @@ def __chunks(lst, n):
 #https://towardsdatascience.com/extract-features-visualize-filters-and-feature-maps-in-vgg16-and-vgg19-cnn-models-d2da6333edd0
 # image shape=[samples, rows, cols, channels]
 
-def extract_features(image_dir_path, frames_chunks=25, features_chunks = 5, selection_factor = 5):
+def extract_features(image_dir_path, frames_chunks=25, features_chunks = 5, selection_factor = 5, arq = "InceptionV3"):
 
     __print_cuda_summary()
     
@@ -35,9 +32,16 @@ def extract_features(image_dir_path, frames_chunks=25, features_chunks = 5, sele
 
     print(f"Step 1: Processing {frames_count} frames from path {image_dir_path}")
 
-    vgg = VGG16(weights='imagenet', include_top=False)
-    model = Flatten(name="flatten") (vgg.output)
-    model = Model(inputs=vgg.input, outputs=model)
+    if arq == "VGG16":
+        module = vgg16
+        instance = vgg16.VGG16(weights='imagenet', include_top=False)
+    
+    elif arq == "InceptionV3":
+        module = inception_v3
+        instance = inception_v3.InceptionV3(weights='imagenet', include_top=False)
+
+    model = Flatten(name="flatten") (instance.output)
+    model = Model(inputs=instance.input, outputs=model)
 
     model.summary()
     
@@ -59,7 +63,7 @@ def extract_features(image_dir_path, frames_chunks=25, features_chunks = 5, sele
     
     print("Step 2: Images ready as numpy arrays")
     X = np.array(X).squeeze() #Removes the 'samples' part of the shape from each image, which is of shape=1, and the new amount of sample will be the first array, containing the amount of images.
-    X = preprocess_input(X)
+    X = module.preprocess_input(X)
 
     print("Step 3: Extracting features with chucks")
 

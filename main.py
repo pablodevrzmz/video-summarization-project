@@ -12,12 +12,12 @@ Dataset summary
 {'Air_Force_One.mp4': 4494, 'Base jumping.mp4': 4729, 'Bearpark_climbing.mp4': 3341, 'Bike Polo.mp4': 3064, 'Bus_in_Rock_Tunnel.mp4': 5131, 'car_over_camera.mp4': 4382, 'Car_railcrossing.mp4': 5075, 'Cockpit_Landing.mp4': 9046, 'Cooking.mp4': 1280, 'Eiffel Tower.mp4': 4971, 'Excavators river crossing.mp4': 9721, 'Fire Domino.mp4': 1612, 'Jumps.mp4': 950, 'Kids_playing_in_leaves.mp4': 3187, 'Notre_Dame.mp4': 4608, 'Paintball.mp4': 6096, 'paluma_jump.mp4': 2574, 'playing_ball.mp4': 3119, 'Playing_on_water_slide.mp4': 3065, 'Saving dolphines.mp4': 6683, 'Scuba.mp4': 2221, 'St Maarten Landing.mp4': 1751, 'Statue of Liberty.mp4': 3863, 'Uncut_Evening_Flight.mp4': 9672, 'Valparaiso_Downhill.mp4': 5178}
 '''
 
-CLUSTERS_PERCENTAGE = 0.15
-SMOOTH_RATE = 2
+CLUSTERS_PERCENTAGE = 0.10
+SMOOTH_RATE = 25
 NUMBER_OF_FRAME_CHUNKS = 25
-NUMBER_OF_FRAME_SELECTION_FACTOR = 2
+NUMBER_OF_FRAME_SELECTION_FACTOR = 5
 NUMBER_OF_FLATTEN_ARRAYS_CHUNKS = 5
-
+ARCHITECTURES = ["VGG16","InceptionV3"]
 
 VIDEOS = [
     "Air_Force_One.mp4",
@@ -68,10 +68,10 @@ def split_dataset(dataset_path):
 
     return frames_counter
 
-def run_video_sumarization(frames_path):
+def run_video_sumarization(frames_path,architecture):
 
     # Extract feautures. Stage (2)
-    data = extract_features(frames_path, NUMBER_OF_FRAME_CHUNKS, NUMBER_OF_FLATTEN_ARRAYS_CHUNKS,NUMBER_OF_FRAME_SELECTION_FACTOR)
+    data = extract_features(frames_path, NUMBER_OF_FRAME_CHUNKS, NUMBER_OF_FLATTEN_ARRAYS_CHUNKS,NUMBER_OF_FRAME_SELECTION_FACTOR,architecture)
     print(f"Features summary: final array shape: {data[0].shape}, used frames: {len(data[1])}")
 
     all_frames = data[2]
@@ -94,12 +94,13 @@ def run_video_sumarization(frames_path):
         # Create videos
         print(f"Creating video resulting of {v}...")
         video_name = [e for e in frames_path.split("\\") if len(e) > 0].pop()
-        summarizer.create_video_from_frames(all_frames,video_name,final_bit_map,v)
+        summarizer.create_video_from_frames(all_frames,video_name,final_bit_map,v,architecture)
     
     # Run evaluation
     for algo in algorithms:
         f1_score, y, y_hat = evaluate.get_f1_score(f"{frames_path}{algo}.csv","./scores_dataset/SumMe/" + video_name + ".csv")
         print(f"{algo}: F1 Score = ",f1_score)
+        save_results(video_name,algo,architecture,f1_score)
 
 def generate_dataset(path):
     # Stage (1)
@@ -137,14 +138,39 @@ def summarization_bit_map(all_frames,selected_frames,centers_indices,smooth_rate
 
     return final_map
 
+def save_results(video_name,algo,arq,score):
+
+    if not os.path.exists("results"):
+        os.mkdir("results")
+
+    if not os.path.exists(f"results\\{video_name}"):
+        os.mkdir(f"results\\{video_name}")
+        r = open(f"results\\{video_name}\\summary.csv",mode="w+")
+        r.write("f1_score,algo,archi\n")
+        r.close
+
+    r = open(f"results\\{video_name}\\summary.csv",mode="a+")
+    r.write(f"{score},{algo},{arq}\n")
+    r.close()
+    
+
+# Comando para leer todo
+# python .\main.py .\SumMe\videos\
 
 if __name__ == "__main__":
 
-    dataset_path = sys.argv[1] # frames_per_video = split_dataset("C:\\Users\\XPC\\Downloads\\SumMe\\videos\\
-    video_frame_path = sys.argv[2] # ./frames_dataset/SumMe/Jumps/
-
+    dataset_path = sys.argv[1] 
+    
     # Preprocessing steps
     generate_dataset(dataset_path)
-
-    # Summarize video frames
-    run_video_sumarization(video_frame_path)
+    
+    if len(sys.argv) >=3:    
+        video_frame_path = sys.argv[2]
+        for a in ARCHITECTURES:
+            run_video_sumarization(video_frame_path,a)
+    else:
+        # Summarize video frames
+        for video in VIDEOS[:]:
+            for a in ARCHITECTURES:
+                path = f".\\frames_dataset\\SumMe\\{video.replace('.mp4','').replace(' ','_')}\\"
+                run_video_sumarization(path,a)

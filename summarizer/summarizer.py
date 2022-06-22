@@ -4,7 +4,7 @@ from numpy import unique
 
 FOLDER="summarized_videos\\"
 
-def create_video_from_frames(frames,prefix,bitmap,algo):
+def create_video_from_frames(frames,prefix,bitmap,algo,arqui):
 
     assert len(frames) == len(bitmap)
     
@@ -31,7 +31,7 @@ def create_video_from_frames(frames,prefix,bitmap,algo):
 
     print(f"Selected frames to create video {len(selected_frames)}")
 
-    out = cv2.VideoWriter(f"{FOLDER}{prefix}\\{prefix}_{algo}.avi",cv2.VideoWriter_fourcc(*'DIVX'), 25, size)
+    out = cv2.VideoWriter(f"{FOLDER}{prefix}\\{prefix}_{algo}_{arqui}.avi",cv2.VideoWriter_fourcc(*'DIVX'), 25, size)
     
     for i in range(len(img_array)):
         out.write(img_array[i])
